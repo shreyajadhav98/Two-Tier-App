@@ -1,30 +1,47 @@
 pipeline {
+
     agent any
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Source') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Docker Compose Down') {
+        stage('Stop Existing Containers') {
             steps {
-                sh 'docker compose down || true'
+                sh '''
+                docker compose down || true
+                '''
             }
         }
 
-        stage('Docker Compose Build') {
+        stage('Build Docker Images') {
             steps {
-                sh 'docker compose build'
+                sh '''
+                docker compose build
+                '''
             }
         }
 
-        stage('Docker Compose Up') {
+        stage('Run Application') {
             steps {
-                sh 'docker compose up -d'
+                sh '''
+                docker compose up -d
+                '''
             }
         }
+
+        stage('Verify Running Containers') {
+            steps {
+                sh '''
+                docker ps
+                '''
+            }
+        }
+
     }
+
 }
