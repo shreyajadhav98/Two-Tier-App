@@ -3,33 +3,24 @@ from database import get_connection
 
 app = Flask(__name__)
 
-# DATABASE = "employee.db"
-
-
-# def get_connection():
-#     conn = sqlite3.connect(DATABASE)
-#     conn.row_factory = sqlite3.Row
-#     return conn
-
-
-# def create_table():
-#     conn = get_connection()
-
-#     conn.execute("""
-#         CREATE TABLE IF NOT EXISTS employees(
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             name TEXT NOT NULL,
-#             email TEXT NOT NULL,
-#             department TEXT NOT NULL,
-#             salary INTEGER NOT NULL
-#         )
-#     """)
-
-#     conn.commit()
-#     conn.close()
-
-
 # create_table()
+def create_table():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS employees (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100),
+        email VARCHAR(100),
+        department VARCHAR(100),
+        salary INT
+    )
+    """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 
 @app.route("/")
@@ -153,5 +144,8 @@ def edit_employee(id):
     return render_template("edit_employee.html", employee=employee)
 
 
+create_table()
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Add host='0.0.0.0' here
+    app.run(host='0.0.0.0', port=5000, debug=True)
