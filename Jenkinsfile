@@ -3,24 +3,27 @@ pipeline {
 
     stages {
 
-        stage('Clone') {
+        stage('Checkout') {
             steps {
-                echo 'Repository cloned successfully.'
+                checkout scm
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Compose Down') {
             steps {
-                sh 'docker build -t flask-app .'
+                sh 'docker compose down || true'
             }
         }
 
-        stage('Run Container') {
+        stage('Docker Compose Build') {
             steps {
-                sh '''
-                docker rm -f flask-container || true
-                docker run -d --name flask-container -p 5000:5000 flask-app
-                '''
+                sh 'docker compose build'
+            }
+        }
+
+        stage('Docker Compose Up') {
+            steps {
+                sh 'docker compose up -d'
             }
         }
     }
