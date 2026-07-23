@@ -1,27 +1,43 @@
 pipeline {
     agent any
 
+    // Enable GitHub webhook triggering
+    triggers {
+        githubPush()
+    }
+
     stages {
-        stage('Stop Existing Containers') {
+        stage('Checkout Code') {
             steps {
+                echo 'Pulling latest code from GitHub...'
+                // Code checkout is automatically handled by Pipeline SCM
+            }
+        }
+
+        stage('Stop & Clean Containers') {
+            steps {
+                echo 'Stopping existing containers...'
                 sh 'docker compose down || true'
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Docker Build') {
             steps {
+                echo 'Building Docker images...'
                 sh 'docker compose build'
             }
         }
 
-        stage('Run Application') {
+        stage('Deploy (Docker Compose Up)') {
             steps {
+                echo 'Deploying application...'
                 sh 'docker compose up -d'
             }
         }
 
-        stage('Verify Running Containers') {
+        stage('Verify Deployment') {
             steps {
+                echo 'Verifying active containers...'
                 sh 'docker ps'
             }
         }
@@ -29,10 +45,11 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment successful! Application running on http://localhost:5000'
+            echo 'SUCCESS: Phase 10 automated deployment complete!'
+            echo 'App live at: http://localhost:5000'
         }
         failure {
-            echo 'Pipeline failed. Check stage logs for details.'
+            echo 'FAILURE: Automation pipeline failed. Check console logs.'
         }
     }
 }
